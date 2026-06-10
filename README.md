@@ -16,30 +16,26 @@ Everything in this repo has been built, tested, and is actively running on `cair
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  cairahq.com                                                │
-│                                                             │
-│  ┌─────────────────┐         ┌──────────────────────────┐   │
-│  │  Okta           │         │  Google Workspace        │   │
-│  │  Identity       │◄───────►│  Business Starter        │   │
-│  │  Provider       │  SAML   │  Service Provider        │   │
-│  │                 │  SCIM   │                          │   │
-│  │  okta.cairahq   │         │  mail.cairahq.com        │   │
-│  │  .com           │         │  drive.cairahq.com       │   │
-│  └─────────────────┘         │  calendar.cairahq.com    │   │
-│                              └──────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    TF[Terraform<br/>Infrastructure as Code]
+    TF -->|provisions| Okta
+
+    Okta[Okta<br/>Identity Provider<br/>okta.cairahq.com]
+    GW[Google Workspace<br/>Business Starter<br/>mail / drive / calendar.cairahq.com]
+
+    Okta <-->|SAML / SCIM| GW
 ```
 
 **Current stack:**
 
 | Layer | Tool | Purpose |
 |-------|------|---------|
+| Infrastructure as Code | Terraform | User provisioning, Okta resource management |
 | Identity Provider | Okta Integrator Free Plan | SSO, MFA, SCIM provisioning, security policies |
 | Collaboration | Google Workspace Business Starter | Email, Drive, Calendar |
 | DNS | GoDaddy | Domain and subdomain management |
-| Custom Domains | okta.cairahq.com | Okta tenant custom domain |
+| Custom Domain | okta.cairahq.com | Okta tenant custom domain |
 | Vanity URLs | mail / drive / calendar.cairahq.com | Google Workspace service shortcuts |
 
 ---
@@ -51,11 +47,20 @@ The identity layer is built on Okta as the IdP, federating with Google Workspace
 
 → [Identity layer documentation](./identity/README.md)
 
+### Infrastructure as Code
+Okta resources are managed via Terraform using the Okta provider. Terraform defines the desired state — users, group membership, and app assignments are declared as code and applied to Okta. Okta is the runtime source of truth for identity, with SCIM handling downstream propagation to Google Workspace — no users are created directly in Google.
+
+→ [Terraform documentation](./terraform/README.md)
+
 ---
 
 ## Design Principles
 
 **Identity is the control plane.** Access to every service flows through Okta. No direct Google password auth for standard users — every login is an Okta-authenticated session.
+
+**Infrastructure managed as code.** Okta users, groups, and policies are defined in Terraform. Manual configuration is documented and exists only where provider support is unavailable. The goal is a repo that reflects the actual running state of the environment.
+
+**Okta is the source of truth.** Users are provisioned in Okta and pushed downstream via SCIM. Nothing is created directly in Google Workspace or any other service. This keeps offboarding clean and prevents config drift across systems.
 
 **NIST 800-63B alignment.** Password policy follows current NIST guidance: no arbitrary expiration, minimum length over complexity requirements, breach detection enabled, MFA required as a compensating control.
 
@@ -83,10 +88,11 @@ This repo is the applied environment. The [`infrastructure-portfolio`](https://g
 | SAML SSO federation | ✅ Working |
 | Custom domain (okta.cairahq.com) | ✅ Live |
 | Vanity URLs (mail / drive / calendar) | ✅ Live |
-| SCIM provisioning | ⚠️ Configured — pending Google new tenant trust resolution |
+| SCIM provisioning | ✅ Configured |
 | MFA enrollment policy | ✅ Configured |
 | Password policy | ✅ Configured |
 | Session policy | ✅ Configured |
+| Terraform — Okta provider | 🔲 In progress |
 | Okta Workflows | 🔲 In progress |
 | Conditional Access / Sign-on Policies | 🔲 Planned |
 

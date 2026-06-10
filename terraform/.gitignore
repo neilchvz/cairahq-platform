@@ -1,0 +1,11 @@
+# Terraform state
+*.tfstate
+*.tfstate.backup
+
+# Terraform working directory
+.terraform/
+.terraform.lock.hcl
+
+# Variable values — never commit secrets
+*.tfvars
+*.tfvars.json

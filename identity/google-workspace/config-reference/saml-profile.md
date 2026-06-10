@@ -10,8 +10,8 @@ Google Workspace is configured as a SAML 2.0 Service Provider using a third-part
 |---------|-------|
 | Profile name | Okta |
 | Profile type | SAML |
-| IDP entity ID | http://www.okta.com/exk13x3vp38bvOb3l698 |
-| Sign-in page URL | https://integrator-7484148.okta.com/app/google/exk13x3vp38bvOb3l698/sso/saml |
+| IDP entity ID | http://www.okta.com/{app-id} |
+| Sign-in page URL | https://integrator-7484148.okta.com/app/google/{app-id}/sso/saml |
 | Sign-out page URL | https://integrator-7484148.okta.com |
 | Autofill email | Send email address as LoginHint parameter (Okta format) |
 | Verification certificate | Okta signing certificate (downloaded from Okta app) |
@@ -20,10 +20,10 @@ Google Workspace is configured as a SAML 2.0 Service Provider using a third-part
 
 | Setting | Value |
 |---------|-------|
-| Entity ID | https://accounts.google.com/samlrp/01oiipzl4051y4g |
-| ACS URL | https://accounts.google.com/samlrp/01oiipzl4051y4g/acs |
+| Entity ID | https://accounts.google.com/samlrp/{sso-profile-id} |
+| ACS URL | https://accounts.google.com/samlrp/{sso-profile-id}/acs |
 
-The RPID (`01oiipzl4051y4g`) is the unique identifier for this SSO profile and must be entered in the RPID field of the Okta Google Workspace app configuration.
+The RPID (`{sso-profile-id}`) is the unique identifier for this SSO profile and must be entered in the RPID field of the Okta Google Workspace app configuration.
 
 ## Profile Assignment
 

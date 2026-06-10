@@ -13,18 +13,18 @@ Google Workspace is configured as a SAML 2.0 Service Provider with Okta as the I
 | App integration | Google Workspace (pre-built Okta catalog) |
 | Sign-on method | SAML 2.0 |
 | Application username format | Email |
-| RPID | 01oiipzl4051y4g |
-| Sign on URL | https://integrator-7484148.okta.com/app/google/exk13x3vp38bvOb3l698/sso/saml |
+| RPID | {sso-profile-id} |
+| Sign on URL | https://integrator-7484148.okta.com/app/google/{app-id}/sso/saml |
 | Sign out URL | https://integrator-7484148.okta.com |
-| Issuer | http://www.okta.com/exk13x3vp38bvOb3l698 |
+| Issuer | http://www.okta.com/{app-id} |
 
 ### Google Workspace Side
 
 | Setting | Value |
 |---------|-------|
 | SSO profile name | Okta |
-| IDP entity ID | http://www.okta.com/exk13x3vp38bvOb3l698 |
-| Sign-in page URL | https://integrator-7484148.okta.com/app/google/exk13x3vp38bvOb3l698/sso/saml |
+| IDP entity ID | http://www.okta.com/{app-id} |
+| Sign-in page URL | https://integrator-7484148.okta.com/app/google/{app-id}/sso/saml |
 | Sign-out page URL | https://integrator-7484148.okta.com |
 | Autofill email | Send email address in the URL as the LoginHint parameter |
 | Profile assignment | Caira HQ org unit — Okta SAML |
@@ -58,10 +58,10 @@ The pre-built Okta Google Workspace integration ships with a legacy SAML configu
 - Recipient: `https://www.google.com/a//acs` (domain missing, double slash)
 
 **Correct (after RPID fix):**
-- Issuer: `http://www.okta.com/{appId}`
-- Recipient: `https://accounts.google.com/samlrp/{RPID}/acs`
+- Issuer: `http://www.okta.com/{app-id}`
+- Recipient: `https://accounts.google.com/samlrp/{sso-profile-id}/acs`
 
-**Fix:** Set the RPID field in Okta's Advanced Sign-on Settings to the unique ID from the Google SSO profile Entity ID (`https://accounts.google.com/samlrp/{RPID}`). Then update the IDP Entity ID in the Google SSO profile to match Okta's new issuer format.
+**Fix:** Set the RPID field in Okta's Advanced Sign-on Settings to the unique ID from the Google SSO profile Entity ID (`https://accounts.google.com/samlrp/{sso-profile-id}`). Then update the IDP Entity ID in the Google SSO profile to match Okta's new issuer format.
 
 This is not documented in Okta's standard Google Workspace setup instructions and requires trial and error or SAML assertion inspection via the Preview SAML tool to diagnose.
 

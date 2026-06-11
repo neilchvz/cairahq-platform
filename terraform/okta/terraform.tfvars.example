@@ -1,0 +1,5 @@
+# Copy this file to terraform.tfvars and fill in your values
+# Never commit terraform.tfvars — it is gitignored
+
+okta_org_name         = "your-okta-org-name"
+default_temp_password = "your-temp-password"

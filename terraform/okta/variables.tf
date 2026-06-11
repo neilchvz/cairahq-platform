@@ -8,3 +8,9 @@ variable "okta_api_token" {
   type        = string
   sensitive   = true
 }
+
+variable "default_temp_password" {
+  description = "Default temporary password for all new users. Users are forced to change on first login."
+  type        = string
+  sensitive   = true
+}

@@ -22,19 +22,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3.1.2
         with:
-          terraform_version: "~> 1.0"
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Init
         run: terraform init
-        env:
-          TF_VAR_okta_api_token: ${{ secrets.OKTA_API_TOKEN }}
-          TF_VAR_okta_org_name: ${{ secrets.OKTA_ORG_NAME }}
-          TF_VAR_default_temp_password: ${{ secrets.DEFAULT_TEMP_PASSWORD }}
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive
@@ -45,15 +41,7 @@ jobs:
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
-        env:
-          TF_VAR_okta_api_token: ${{ secrets.OKTA_API_TOKEN }}
-          TF_VAR_okta_org_name: ${{ secrets.OKTA_ORG_NAME }}
-          TF_VAR_default_temp_password: ${{ secrets.DEFAULT_TEMP_PASSWORD }}
 
       - name: Terraform Apply
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve
-        env:
-          TF_VAR_okta_api_token: ${{ secrets.OKTA_API_TOKEN }}
-          TF_VAR_okta_org_name: ${{ secrets.OKTA_ORG_NAME }}
-          TF_VAR_default_temp_password: ${{ secrets.DEFAULT_TEMP_PASSWORD }}

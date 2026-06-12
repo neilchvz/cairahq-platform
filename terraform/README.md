@@ -19,6 +19,8 @@ graph TD
     Okta --> E[groups.tf<br/>group resources and membership]
     Okta --> F[app_assignments.tf<br/>Google Workspace app assignments]
     Okta --> G[data/<br/>user roster CSV]
+    TF --> GH[.github/workflows/]
+    GH --> H[terraform.yml<br/>CI/CD pipeline]
 ```
 
 ---
@@ -53,6 +55,26 @@ Add a row to `data/users.csv` and run `terraform apply`. No code changes require
 
 ---
 
+## CI/CD Pipeline
+
+All Terraform changes are gated through a GitHub Actions pipeline. No infrastructure changes reach production without passing automated checks and explicit approval.
+
+**On Pull Request:**
+- `terraform fmt` — validates code formatting
+- `terraform validate` — validates configuration syntax
+- `terraform plan` — shows exactly what will change before any human reviews the PR
+
+**On Merge to Main:**
+- `terraform apply` — automatically applies the approved changes
+
+The pipeline only triggers when files in `terraform/**` are modified — unrelated changes such as documentation updates do not kick off a Terraform run.
+
+Secrets are stored in GitHub Actions repository secrets and injected at runtime. They are never stored in code or committed to the repository.
+
+→ [Pipeline configuration](../.github/workflows/terraform.yml)
+
+---
+
 ## User Provisioning
 
 User data is managed via `data/users.csv` rather than hardcoded Terraform resources. Each row represents one user. Terraform reads the CSV and dynamically creates one Okta user resource per row using `for_each`.
@@ -67,26 +89,4 @@ Users are created as ACTIVE with a temporary password set via `var.default_temp_
 
 ## State
 
-Local state is used in this lab environment. In production, state would be stored remotely — Terraform Cloud, S3 with DynamoDB locking, or similar — to support collaboration, state locking, and audit history.
-
-The `terraform.tfstate` file and any `.tfvars` files are gitignored and never committed.
-
----
-
-## Design Decisions
-
-**CSV as HRIS simulation.** User data lives in `data/users.csv` rather than hardcoded variables. Adding a user means adding a row — no code changes. This mirrors how production environments source user data from an HRIS system, keeping the provisioning code generic and the data separate.
-
-**Okta as the identity source of truth.** All user accounts are created and managed in Okta via Terraform. No users are provisioned directly in Google Workspace or any downstream service — that is handled by SCIM after Okta receives the resource.
-
-**Single group for SSO and SCIM.** The `Google Workspace SSO/SCIM` group handles both app access and SCIM provisioning. A single group keeps membership management simple in a single-operator environment — one group assignment covers both access and provisioning. In a larger environment these would be separated to allow finer-grained control over who gets provisioned vs who gets SSO access.
-
-**Admin-set passwords over activation emails.** Users are created as ACTIVE with a temporary password set by Terraform. The admin communicates the password directly rather than relying on an activation email. This avoids the bootstrapping problem where the activation email is sent to a mailbox that doesn't exist until after provisioning completes — a constraint that exists in any environment where the mailbox is a downstream result of the provisioning event itself.
-
-**Secrets via environment variables.** The API token is passed as `TF_VAR_okta_api_token` at runtime. This is the correct pattern for both local development and CI/CD pipelines (GitHub Actions secrets, etc.) — no credentials ever touch the codebase.
-
-**Variables for all org-specific values.** The Okta org name and all environment-specific values are declared as variables and populated via `terraform.tfvars` locally. This keeps the configuration portable and the repo free of environment-specific hardcoding.
-
----
-
-*Part of [Caira HQ — Platform](../README.md) · Neil Chavez · Creator of things.*
+Local state is used in this lab environment. In production, state would be stored remotely — Terraform Cloud, S3 with

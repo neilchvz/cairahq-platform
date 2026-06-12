@@ -9,3 +9,10 @@ data "okta_group" "google_workspace" {
 data "okta_group" "okta_admins" {
   name = "Okta Administrators"
 }
+
+# Contractors group — for external contractors and vendors
+# Members are granted scoped access based on app assignments
+resource "okta_group" "contractors" {
+  name        = "Contractors"
+  description = "External contractors and vendors. Access is scoped per engagement — members are not automatically provisioned into Google Workspace."
+}

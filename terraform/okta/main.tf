@@ -1,4 +1,12 @@
 terraform {
+  cloud {
+    organization = "cairahq"
+
+    workspaces {
+      name = "cairahq-platform"
+    }
+  }
+
   required_providers {
     okta = {
       source  = "okta/okta"
@@ -9,10 +17,10 @@ terraform {
   required_version = ">= 1.0"
 
   # Remote state note:
-  # In a production environment, state would be stored remotely (Terraform Cloud,
-  # S3 + DynamoDB locking, etc.) to support team collaboration, state locking,
-  # and audit history. Local state is used here as this is a single-operator
-  # lab environment.
+  # State is stored remotely in HCP Terraform (Terraform Cloud). This supports
+  # state locking, audit history, and team collaboration — the same pattern
+  # used in production environments. Local state was used initially and migrated
+  # to remote state once the CI/CD pipeline was introduced.
 }
 
 provider "okta" {

@@ -18,19 +18,20 @@ Everything in this repo has been built, tested, and is actively running on `cair
 
 ```mermaid
 graph TD
-    TF[Terraform<br/>Infrastructure as Code]
-    TF -->|provisions| Okta
-
-    Okta[Okta<br/>Identity Provider<br/>okta.cairahq.com]
-    GW[Google Workspace<br/>Business Starter<br/>mail / drive / calendar.cairahq.com]
-
-    Okta <-->|SAML / SCIM| GW
+    GH[GitHub<br/>Source of Truth]
+    GH -->|triggers| GHA[GitHub Actions<br/>CI/CD Pipeline]
+    GHA -->|plan / apply| HCP[HCP Terraform<br/>Remote State & Approvals]
+    HCP -->|provisions| Okta[Okta<br/>Identity Provider<br/>okta.cairahq.com]
+    Okta <-->|SAML / SCIM| GW[Google Workspace<br/>Business Starter<br/>mail / drive / calendar.cairahq.com]
 ```
 
 **Current stack:**
 
 | Layer | Tool | Purpose |
 |-------|------|---------|
+| Source Control | GitHub | Infrastructure as code, GitOps workflow |
+| CI/CD Pipeline | GitHub Actions | Automated plan, validate, and apply on PR/merge |
+| Remote State & Approvals | HCP Terraform | State management, run history, manual apply gate |
 | Infrastructure as Code | Terraform | User provisioning, Okta resource management |
 | Identity Provider | Okta Integrator Free Plan | SSO, MFA, SCIM provisioning, security policies |
 | Collaboration | Google Workspace Business Starter | Email, Drive, Calendar |
@@ -50,6 +51,8 @@ The identity layer is built on Okta as the IdP, federating with Google Workspace
 ### Infrastructure as Code
 Okta resources are managed via Terraform using the Okta provider. Terraform defines the desired state — users, group membership, and app assignments are declared as code and applied to Okta. Okta is the runtime source of truth for identity, with SCIM handling downstream propagation to Google Workspace — no users are created directly in Google.
 
+All Terraform changes flow through a GitOps pipeline — branch, pull request, automated checks, human approval, and automated apply via HCP Terraform. State is stored remotely in HCP Terraform.
+
 → [Terraform documentation](./terraform/README.md)
 
 ---
@@ -59,6 +62,8 @@ Okta resources are managed via Terraform using the Okta provider. Terraform defi
 **Identity is the control plane.** Access to every service flows through Okta. No direct Google password auth for standard users — every login is an Okta-authenticated session.
 
 **Infrastructure managed as code.** Okta users, groups, and policies are defined in Terraform. Manual configuration is documented and exists only where provider support is unavailable. The goal is a repo that reflects the actual running state of the environment.
+
+**GitOps as the change model.** All infrastructure changes flow through Git. No direct console access to create or modify resources — everything is declared in code, reviewed via pull request, and applied through the pipeline. Every change has a complete audit trail.
 
 **Okta is the source of truth.** Users are provisioned in Okta and pushed downstream via SCIM. Nothing is created directly in Google Workspace or any other service. This keeps offboarding clean and prevents config drift across systems.
 
@@ -92,8 +97,11 @@ This repo is the applied environment. The [`infrastructure-portfolio`](https://g
 | MFA enrollment policy | ✅ Configured |
 | Password policy | ✅ Configured |
 | Session policy | ✅ Configured |
-| Terraform — Okta provider | 🔲 In progress |
+| Terraform — Okta provider | ✅ Live |
+| GitHub Actions CI/CD pipeline | ✅ Live |
+| HCP Terraform remote state | ✅ Live |
 | Okta Workflows | 🔲 In progress |
+| Endpoint management — FleetDM | 🔲 Planned |
 | Conditional Access / Sign-on Policies | 🔲 Planned |
 
 ---

@@ -30,11 +30,20 @@ graph TD
 ### Prerequisites
 
 - [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.0
+- HCP Terraform account with access to the `cairahq` organization
 - Okta API token with sufficient privileges (super admin or custom role with user/group/app management)
 
 ### Authentication
 
-The Okta API token is passed via environment variable and never stored in code or committed to the repo:
+**HCP Terraform** — authenticate the local CLI with HCP Terraform before running any commands:
+
+```bash
+terraform login
+```
+
+This stores a token locally that allows Terraform to communicate with HCP Terraform for state and runs.
+
+**Okta API token** — stored as a workspace variable in HCP Terraform. For local runs it can also be passed via environment variable:
 
 ```bash
 export TF_VAR_okta_api_token="your-api-token"
@@ -44,6 +53,7 @@ export TF_VAR_okta_api_token="your-api-token"
 
 ```bash
 cd terraform/okta
+terraform login
 terraform init
 terraform plan
 terraform apply
@@ -51,13 +61,13 @@ terraform apply
 
 ### Adding a New User
 
-Add a row to `data/users.csv` and run `terraform apply`. No code changes required.
+Add a row to `data/users.csv` and open a pull request. The CI/CD pipeline handles the rest — no manual apply required.
 
 ---
 
 ## CI/CD Pipeline
 
-All Terraform changes are gated through a GitHub Actions pipeline. No infrastructure changes reach production without passing automated checks and explicit approval.
+All Terraform changes are gated through a GitHub Actions pipeline backed by HCP Terraform. No infrastructure changes reach production without passing automated checks and explicit approval.
 
 **On Pull Request:**
 - `terraform fmt` — validates code formatting
@@ -65,13 +75,16 @@ All Terraform changes are gated through a GitHub Actions pipeline. No infrastruc
 - `terraform plan` — shows exactly what will change before any human reviews the PR
 
 **On Merge to Main:**
-- `terraform apply` — automatically applies the approved changes
+- GitHub Actions triggers HCP Terraform
+- HCP Terraform runs `terraform apply` against the remote state
+- A manual confirmation step in HCP Terraform provides a final approval gate before resources are created or modified
 
 The pipeline only triggers when files in `terraform/**` are modified — unrelated changes such as documentation updates do not kick off a Terraform run.
 
-Secrets are stored in GitHub Actions repository secrets and injected at runtime. They are never stored in code or committed to the repository.
+Secrets are stored in HCP Terraform workspace variables and GitHub Actions repository secrets. They are never stored in code or committed to the repository.
 
 → [Pipeline configuration](../.github/workflows/terraform.yml)
+→ [HCP Terraform workspace](https://app.terraform.io/app/cairahq/workspaces/cairahq-platform)
 
 ---
 
@@ -89,4 +102,35 @@ Users are created as ACTIVE with a temporary password set via `var.default_temp_
 
 ## State
 
-Local state is used in this lab environment. In production, state would be stored remotely — Terraform Cloud, S3 with
+State is stored remotely in HCP Terraform. This provides:
+
+- **State locking** — prevents concurrent runs from corrupting state
+- **Audit history** — every plan and apply is logged with who triggered it and what changed
+- **Manual apply gate** — changes can be reviewed in the HCP Terraform UI before being applied to production
+- **Team collaboration** — state is accessible to any authorized pipeline or operator, not tied to a local machine
+
+The `terraform.tfstate` file and any `.tfvars` files are gitignored and never committed. All sensitive variable values are stored in HCP Terraform workspace variables.
+
+---
+
+## Design Decisions
+
+**GitOps as the change model.** All infrastructure changes flow through Git. There is no direct console access to create or modify resources — everything is declared in code, reviewed via pull request, and applied through the pipeline. This provides a complete audit trail of every change: who made it, what changed, who approved it, and when it was applied.
+
+**HCP Terraform for remote state and approvals.** State is stored in HCP Terraform rather than locally. This mirrors production patterns where state must be accessible to CI/CD pipelines and protected from local machine loss or corruption. The manual apply gate in HCP Terraform provides a second approval checkpoint beyond the GitHub PR review.
+
+**CSV as HRIS simulation.** User data lives in `data/users.csv` rather than hardcoded variables. Adding a user means adding a row — no code changes. This mirrors how production environments source user data from an HRIS system, keeping the provisioning code generic and the data separate.
+
+**Okta as the identity source of truth.** All user accounts are created and managed in Okta via Terraform. No users are provisioned directly in Google Workspace or any downstream service — that is handled by SCIM after Okta receives the resource.
+
+**Single group for SSO and SCIM.** The `Google Workspace SSO/SCIM` group handles both app access and SCIM provisioning. A single group keeps membership management simple in a single-operator environment — one group assignment covers both access and provisioning. In a larger environment these would be separated to allow finer-grained control over who gets provisioned vs who gets SSO access.
+
+**Admin-set passwords over activation emails.** Users are created as ACTIVE with a temporary password set by Terraform. The admin communicates the password directly rather than relying on an activation email. This avoids the bootstrapping problem where the activation email is sent to a mailbox that doesn't exist until after provisioning completes — a constraint that exists in any environment where the mailbox is a downstream result of the provisioning event itself.
+
+**Secrets via environment variables and HCP Terraform workspace variables.** The Okta API token and other sensitive values are never stored in code. For local development they are passed as environment variables. In the CI/CD pipeline they are injected from HCP Terraform workspace variables. No credentials ever touch the codebase.
+
+**Variables for all org-specific values.** The Okta org name and all environment-specific values are declared as variables and populated via `terraform.tfvars` locally. This keeps the configuration portable and the repo free of environment-specific hardcoding.
+
+---
+
+*Part of [Caira HQ — Platform](../README.md) · Neil Chavez · Creator of things.*

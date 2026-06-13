@@ -18,11 +18,11 @@ Everything in this repo has been built, tested, and is actively running on `cair
 
 ```mermaid
 graph TD
-    GH[GitHub<br/>Source of Truth]
-    GH -->|triggers| GHA[GitHub Actions<br/>CI/CD Pipeline]
-    GHA -->|plan / apply| HCP[HCP Terraform<br/>Remote State & Approvals]
-    HCP -->|provisions| Okta[Okta<br/>Identity Provider<br/>okta.cairahq.com]
-    Okta <-->|SAML / SCIM| GW[Google Workspace<br/>Business Starter<br/>mail / drive / calendar.cairahq.com]
+    GH["GitHub\nSource of Truth"]
+    GH -->|triggers| GHA["GitHub Actions\nCI/CD Pipeline"]
+    GHA -->|"plan / apply"| HCP["HCP Terraform\nRemote State & Approvals"]
+    HCP -->|provisions| Okta["Okta\nIdentity Provider\nokta.cairahq.com"]
+    Okta <-->|"SAML / SCIM"| GW["Google Workspace\nBusiness Starter\nmail / drive / calendar.cairahq.com"]
 ```
 
 **Current stack:**

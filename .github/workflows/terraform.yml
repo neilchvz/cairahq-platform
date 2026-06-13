@@ -6,11 +6,6 @@ on:
       - main
     paths:
       - 'terraform/**'
-  push:
-    branches:
-      - main
-    paths:
-      - 'terraform/**'
 
 jobs:
   terraform:
@@ -20,14 +15,15 @@ jobs:
       run:
         working-directory: terraform/okta
 
+    env:
+      TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3.1.2
-        with:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform Init
         run: terraform init
@@ -41,7 +37,3 @@ jobs:
       - name: Terraform Plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
-
-      - name: Terraform Apply
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve

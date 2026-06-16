@@ -23,6 +23,8 @@ graph TD
     GHA -->|"plan / apply"| HCP["HCP Terraform\nRemote State & Approvals"]
     HCP -->|provisions| Okta["Okta\nIdentity Provider\nokta.cairahq.com"]
     Okta <-->|"SAML / SCIM"| GW["Google Workspace\nBusiness Starter\nmail / drive / calendar.cairahq.com"]
+    Okta -->|"event triggers"| OW["Okta Workflows\nAutomation Layer"]
+    OW -->|"email notifications"| GW
 ```
 
 **Current stack:**
@@ -34,6 +36,7 @@ graph TD
 | Remote State & Approvals | HCP Terraform | State management, run history, manual apply gate |
 | Infrastructure as Code | Terraform | User provisioning, Okta resource management |
 | Identity Provider | Okta Integrator Free Plan | SSO, MFA, SCIM provisioning, security policies |
+| Automation | Okta Workflows | Event-driven automation — user lifecycle notifications |
 | Collaboration | Google Workspace Business Starter | Email, Drive, Calendar |
 | DNS | GoDaddy | Domain and subdomain management |
 | Custom Domain | okta.cairahq.com | Okta tenant custom domain |
@@ -55,6 +58,21 @@ All Terraform changes flow through a GitOps pipeline — branch, pull request, a
 
 → [Terraform documentation](./terraform/README.md)
 
+### Automation
+The automation layer is built on Okta Workflows, an event-driven automation tool native to Okta. Workflows trigger on identity events and execute actions across connected systems without manual intervention.
+
+**Current flows:**
+
+| Flow | Trigger | Action |
+|------|---------|--------|
+| New User - Admin Notification | User created in Okta | Emails admin@cairahq.com with new user's name, email, title, department, manager, and user type |
+| New User - Welcome Email | User created in Okta | Emails the new user with login details and IT contact information |
+| User Offboarded - Admin Notification | User deactivated in Okta | Emails admin@cairahq.com with offboarded user's details and a reminder to complete offboarding steps |
+
+All flows use a Read User step to fetch full profile data at runtime, ensuring fields populated by Terraform at provisioning time are captured correctly.
+
+→ [Workflows documentation](./workflows/README.md)
+
 ---
 
 ## Design Principles
@@ -64,6 +82,8 @@ All Terraform changes flow through a GitOps pipeline — branch, pull request, a
 **Infrastructure managed as code.** Okta users, groups, and policies are defined in Terraform. Manual configuration is documented and exists only where provider support is unavailable. The goal is a repo that reflects the actual running state of the environment.
 
 **GitOps as the change model.** All infrastructure changes flow through Git. No direct console access to create or modify resources — everything is declared in code, reviewed via pull request, and applied through the pipeline. Every change has a complete audit trail.
+
+**Automation as the default.** Identity events drive automated actions. User provisioning triggers welcome emails and admin notifications without manual intervention. The goal is zero-touch lifecycle management — every joiners, movers, and leavers action handled by the system, with humans involved only for approval gates.
 
 **Okta is the source of truth.** Users are provisioned in Okta and pushed downstream via SCIM. Nothing is created directly in Google Workspace or any other service. This keeps offboarding clean and prevents config drift across systems.
 
@@ -100,10 +120,11 @@ This repo is the applied environment. The [`infrastructure-portfolio`](https://g
 | Terraform — Okta provider | ✅ Live |
 | GitHub Actions CI/CD pipeline | ✅ Live |
 | HCP Terraform remote state | ✅ Live |
-| Okta Workflows | 🔲 In progress |
+| Okta Workflows | ✅ Live |
+| Security policies (MFA, password, session) | ✅ Configured |
 | Endpoint management — FleetDM | 🔲 Planned |
-| Conditional Access / Sign-on Policies | 🔲 Planned |
+| App-level authentication policies | 🔲 Planned — pending FleetDM integration |
 
 ---
 
-Neil Chavez · Creator of things.
+Neil Chavez · Creator of things

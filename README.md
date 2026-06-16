@@ -18,9 +18,11 @@ Everything in this repo has been built, tested, and is actively running on `cair
 
 ```mermaid
 graph TD
-    GH["GitHub\nSource of Truth"]
+    Admin["Admin\nBrowser"]
+    Admin -->|"form submission"| TS["TypeScript Service\nRailway"]
+    TS -->|"creates branch + PR"| GH["GitHub\nSource of Truth"]
     GH -->|triggers| GHA["GitHub Actions\nCI/CD Pipeline"]
-    GHA -->|"plan / apply"| HCP["HCP Terraform\nRemote State & Approvals"]
+    GHA -->|"plan / validate"| HCP["HCP Terraform\nRemote State & Approvals"]
     HCP -->|provisions| Okta["Okta\nIdentity Provider\nokta.cairahq.com"]
     Okta <-->|"SAML / SCIM"| GW["Google Workspace\nBusiness Starter\nmail / drive / calendar.cairahq.com"]
     Okta -->|"event triggers"| OW["Okta Workflows\nAutomation Layer"]
@@ -37,6 +39,8 @@ graph TD
 | Infrastructure as Code | Terraform | User provisioning, Okta resource management |
 | Identity Provider | Okta Integrator Free Plan | SSO, MFA, SCIM provisioning, security policies |
 | Automation | Okta Workflows | Event-driven automation — user lifecycle notifications |
+| Lifecycle Management | TypeScript + Express | Web UI and GitHub API glue for onboarding and offboarding |
+| Hosting | Railway | Production deployment of TypeScript service |
 | Collaboration | Google Workspace Business Starter | Email, Drive, Calendar |
 | DNS | GoDaddy | Domain and subdomain management |
 | Custom Domain | okta.cairahq.com | Okta tenant custom domain |
@@ -56,12 +60,14 @@ Okta resources are managed via Terraform using the Okta provider. Terraform defi
 
 All Terraform changes flow through a GitOps pipeline — branch, pull request, automated checks, human approval, and automated apply via HCP Terraform. State is stored remotely in HCP Terraform.
 
+Provisioning requests originate from the TypeScript onboarding service, which creates branches and opens PRs automatically. Terraform remains the only system that touches Okta directly.
+
 → [Terraform documentation](./terraform/README.md)
 
 ### Automation
-The automation layer is built on Okta Workflows, an event-driven automation tool native to Okta. Workflows trigger on identity events and execute actions across connected systems without manual intervention.
+The automation layer has two components — event-driven notifications via Okta Workflows, and a user lifecycle management service built in TypeScript.
 
-**Current flows:**
+**Okta Workflows — identity event automation:**
 
 | Flow | Trigger | Action |
 |------|---------|--------|
@@ -69,7 +75,9 @@ The automation layer is built on Okta Workflows, an event-driven automation tool
 | New User - Welcome Email | User created in Okta | Emails the new user with login details and IT contact information |
 | User Offboarded - Admin Notification | User deactivated in Okta | Emails admin@cairahq.com with offboarded user's details and a reminder to complete offboarding steps |
 
-All flows use a Read User step to fetch full profile data at runtime, ensuring fields populated by Terraform at provisioning time are captured correctly.
+**TypeScript Service — lifecycle management UI:**
+
+A web-based onboarding and offboarding form hosted on Railway. Admins fill in user details, the service reads the current `users.csv` from GitHub, updates it, creates a branch, commits the change, and opens a PR automatically. Terraform provisions the user on merge. Basic auth protects the form — production upgrade path is Okta SSO.
 
 → [Workflows documentation](./workflows/README.md)
 
@@ -91,7 +99,7 @@ All flows use a Read User step to fetch full profile data at runtime, ensuring f
 
 **Document the decisions, not just the steps.** Every configuration in this repo includes the reasoning behind it — threshold calculations, policy tradeoffs, known limitations, and production recommendations where the lab environment has constraints.
 
-**Build vs buy.** Where battle-tested open-source tools exist (Escrow Buddy, etc.), use them. Where custom scripting adds genuine value, write it. Never build what already exists just to have code to show.
+**Build vs buy.** Where battle-tested open-source tools exist, use them. Where custom scripting adds genuine value, write it. Never build what already exists just to have code to show.
 
 ---
 
@@ -114,17 +122,16 @@ This repo is the applied environment. The [`infrastructure-portfolio`](https://g
 | Custom domain (okta.cairahq.com) | ✅ Live |
 | Vanity URLs (mail / drive / calendar) | ✅ Live |
 | SCIM provisioning | ✅ Configured |
-| MFA enrollment policy | ✅ Configured |
-| Password policy | ✅ Configured |
-| Session policy | ✅ Configured |
+| Security policies (MFA, password, session) | ✅ Configured |
 | Terraform — Okta provider | ✅ Live |
 | GitHub Actions CI/CD pipeline | ✅ Live |
 | HCP Terraform remote state | ✅ Live |
 | Okta Workflows | ✅ Live |
-| Security policies (MFA, password, session) | ✅ Configured |
+| TypeScript onboarding/offboarding service | ✅ Live |
+| Railway hosting | ✅ Live |
 | Endpoint management — FleetDM | 🔲 Planned |
 | App-level authentication policies | 🔲 Planned — pending FleetDM integration |
 
 ---
 
-Neil Chavez · Creator of things
+Neil Chavez · Creator of things.

@@ -61,7 +61,9 @@ terraform apply
 
 ### Adding a New User
 
-Add a row to `data/users.csv` and open a pull request. The CI/CD pipeline handles the rest — no manual apply required.
+Submit an onboarding request via the [Caira HQ Identity Management service](https://cairahq-platform-production.up.railway.app). The service reads the current `users.csv` from GitHub, appends the new user row, creates a branch, and opens a pull request automatically. The CI/CD pipeline handles the rest on merge — no manual CSV editing or branch creation required.
+
+For manual changes, add a row to `data/users.csv` and open a pull request directly.
 
 ---
 
@@ -97,6 +99,8 @@ This pattern simulates a real HRIS integration — in production, this data woul
 The CSV includes an intentional subset of user fields — name, login, email, title, organization, department, division, user type and manager. Fields like personal email and phone number are excluded from this public repository as they constitute PII. In a production HRIS integration these fields would be sourced from the HRIS API directly and would never touch a committed file.
 
 Users are created as ACTIVE with a temporary password set via `var.default_temp_password`. The user is forced to change their password on first login. The admin communicates the temporary password to the user directly — no activation email is required or sent.
+
+Provisioning requests are submitted via the TypeScript onboarding service, which automates the CSV update, branch creation, and PR opening. Terraform remains the only system that directly creates or modifies Okta resources.
 
 ---
 

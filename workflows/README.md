@@ -9,6 +9,7 @@ The goal is zero-touch lifecycle management. Every joiner, mover, and leaver act
 | Directory | Tool | Purpose |
 |-----------|------|---------|
 | okta/ | Okta Workflows | Event-driven automation triggered by identity lifecycle events |
+| typescript/ | TypeScript + Express | Web UI and GitHub API glue for user lifecycle management |
 
 ## Design Principles
 
@@ -16,4 +17,6 @@ The goal is zero-touch lifecycle management. Every joiner, mover, and leaver act
 
 **No manual notifications.** Admin and user notifications are automated. No human should need to remember to send a welcome email or offboarding alert.
 
-**Auditable.** Every workflow execution is logged in Okta Workflows execution history. Every trigger, every action, every output is traceable.
+**Auditable.** Every workflow execution is logged in Okta Workflows execution history. Every TypeScript-generated PR is traceable in GitHub. Every change has a paper trail.
+
+**Humans at the gate, not in the process.** The TypeScript service automates the mechanics of opening a PR. The Okta Workflows automate notifications. Humans approve and merge — the decision is theirs, the repetitive work is not.

@@ -58,7 +58,7 @@ The Okta Integrator Free Plan does not support group-based Global Session Policy
 | Privileged / admin | 8 hours | 30 minutes | Every login |
 | Service accounts | N/A | N/A | N/A |
 
-Group-based targeting requires Okta Identity Engine on a paid plan. This is a documented lab constraint — the architecture is correct, the enforcement granularity requires a paid tier.
+Group-based targeting requires Okta Identity Engine on a paid plan. This is a documented lab constraint, the enforcement granularity requires a paid tier.
 
 ---
 

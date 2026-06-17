@@ -33,13 +33,13 @@ This makes it significantly stronger than SMS OTP or TOTP apps while remaining u
 
 ## SMS / Phone Authenticator
 
-SMS is intentionally excluded. On the Okta Integrator Free Plan, SMS requires a third-party telephony provider (e.g. Twilio) configured via an Inline Hook — adding unnecessary infrastructure complexity for a 2-person lab. More importantly, SMS is the weakest possession factor and is subject to SIM swapping attacks. NIST 800-63B deprecated SMS as a primary authenticator.
+SMS is intentionally excluded. On the Okta Integrator Free Plan, SMS requires a third-party telephony provider (e.g. Twilio) configured via an Inline Hook, adding unnecessary infrastructure complexity for a 2-person lab. More importantly, SMS is the weakest possession factor and is subject to SIM swapping attacks. NIST 800-63B deprecated SMS as a primary authenticator.
 
 In a production environment on a paid Okta plan, SMS would be available as a last-resort fallback but not as a primary factor.
 
 ## Grace Period
 
-The 7-skip grace period on Okta Verify enrollment gives new users flexibility to complete enrollment at their own pace without being immediately locked out. In a production security-conscious environment this would be reduced to 0 — forcing immediate enrollment on first login.
+The 7-skip grace period on Okta Verify enrollment gives new users flexibility to complete enrollment at their own pace without being immediately locked out. In a production security-conscious environment this would be reduced to 0, forcing immediate enrollment on first login.
 
 ---
 

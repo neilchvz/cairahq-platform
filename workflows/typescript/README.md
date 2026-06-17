@@ -8,9 +8,9 @@ A lightweight Express service that provides a web UI for managing user lifecycle
 
 ## Why This Exists
 
-User provisioning in Caira HQ is managed by Terraform — the `users.csv` file is the source of truth and every change flows through a GitOps pipeline. This service removes the manual steps of editing the CSV locally, creating a branch, and opening a PR. Instead, an admin fills out a form and the service handles everything up to the PR automatically.
+User provisioning in Caira HQ is managed by Terraform. The `users.csv` file is the source of truth and every change flows through a GitOps pipeline. This service removes the manual steps of editing the CSV locally, creating a branch, and opening a PR. Instead, an admin fills out a form and the service handles everything up to the PR automatically.
 
-The human approval gate is preserved — no user is ever provisioned without a PR review and merge. The automation handles the repetitive mechanics, not the decision.
+The human approval gate is preserved: no user is ever provisioned without a PR review and merge. The automation handles the repetitive mechanics, not the decision.
 
 ---
 
@@ -110,7 +110,7 @@ Copy `.env.example` to `.env` and fill in values for local development. Producti
 
 ## Deployment
 
-The service is hosted on Railway and connected to this GitHub repository. Every merge to `main` triggers an automatic redeploy — no manual deploy steps required.
+The service is hosted on Railway and connected to this GitHub repository. Every merge to `main` triggers an automatic redeploy. No manual deploy steps required.
 
 **Root directory:** `workflows/typescript`
 **Build command:** `npm run build`
@@ -120,9 +120,9 @@ The service is hosted on Railway and connected to this GitHub repository. Every 
 
 ## Security Notes
 
-**Basic auth** is the current access control mechanism — credentials are required before any form is accessible. This is enforced at the application layer via Express middleware.
+**Basic auth** is the current access control mechanism. Credentials are required before any form is accessible. This is enforced at the application layer via Express middleware.
 
-**Production upgrade path:** Replace basic auth with Okta SSO. The service would be registered as an app in Okta, users authenticate via the existing Okta tenant, and only `@cairahq.com` accounts with the appropriate group membership can access it. This closes the loop — the identity platform protects the tool that manages the identity platform.
+**Production upgrade path:** Replace basic auth with Okta SSO. The service would be registered as an app in Okta, users authenticate via the existing Okta tenant, and only `@cairahq.com` accounts with the appropriate group membership can access it. This closes the loop, the identity platform protects the tool that manages the identity platform.
 
 **PR gate:** Even with auth in place, no user is provisioned without a PR review and merge. The GitHub → Terraform pipeline is the final control. The form cannot bypass the GitOps workflow.
 

@@ -4,7 +4,7 @@ The identity layer is the control plane for cairahq.com. Every user, every app, 
 
 ## Architecture
 
-Okta serves as the Identity Provider (IdP) for the entire org. Google Workspace is the first Service Provider (SP) federated to Okta via SAML 2.0. Users are created and managed in Okta — Google Workspace accounts are provisioned automatically via SCIM, not created manually.
+Okta serves as the Identity Provider (IdP) for the entire org. Google Workspace is the first Service Provider (SP) federated to Okta via SAML 2.0. Users are created and managed in Okta. Google Workspace accounts are provisioned automatically via SCIM, not created manually.
 
 ```
 User attempts to access Google Workspace
@@ -19,8 +19,8 @@ Google grants access
 ```
 
 This means:
-- No Google passwords for standard users — Okta owns authentication
-- MFA is enforced at the IdP layer — Google never sees an unauthenticated request
+- No Google passwords for standard users: Okta owns authentication
+- MFA is enforced at the IdP layer: Google never sees an unauthenticated request
 - Deprovisioning in Okta automatically suspends the Google Workspace account via SCIM
 
 ## Components

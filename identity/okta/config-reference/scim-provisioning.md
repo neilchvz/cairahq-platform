@@ -2,7 +2,7 @@
 
 ## Overview
 
-User provisioning from Okta to Google Workspace is handled via SCIM 2.0. Users created and assigned in Okta are automatically provisioned as Google Workspace accounts — no manual account creation required.
+User provisioning from Okta to Google Workspace is handled via SCIM 2.0. Users created and assigned in Okta are automatically provisioned as Google Workspace accounts, no manual account creation required.
 
 ## Configuration
 

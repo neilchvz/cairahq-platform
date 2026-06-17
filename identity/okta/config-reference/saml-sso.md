@@ -2,7 +2,7 @@
 
 ## Overview
 
-Google Workspace is configured as a SAML 2.0 Service Provider with Okta as the Identity Provider. Authentication for all cairahq.com Google Workspace users flows through Okta — no direct Google password authentication for standard users.
+Google Workspace is configured as a SAML 2.0 Service Provider with Okta as the Identity Provider. Authentication for all cairahq.com Google Workspace users flows through Okta. No direct Google password authentication for standard users.
 
 ## Configuration
 
@@ -67,7 +67,7 @@ This is not documented in Okta's standard Google Workspace setup instructions an
 
 ## Super Admin SSO Exemption
 
-Google Workspace super admin accounts always authenticate directly with Google credentials — they are never redirected to a third-party SSO provider, regardless of what SSO policies are configured in the organization. This is a hard behavioral constraint enforced by Google, not a side effect of policy assignment. (https://support.google.com/a/answer/6341409) The intent is to ensure admins retain access to the Google Admin console even if the IdP goes down or is compromised. (https://support.google.com/a/answer/9464354)
+Google Workspace super admin accounts always authenticate directly with Google credentials, they are never redirected to a third-party SSO provider, regardless of what SSO policies are configured in the organization. This is a hard behavioral constraint enforced by Google, not a side effect of policy assignment. (https://support.google.com/a/answer/6341409) The intent is to ensure admins retain access to the Google Admin console even if the IdP goes down or is compromised. (https://support.google.com/a/answer/9464354)
 
 For this lab, `admin@cairahq.com` authenticates directly with Google. Standard provisioned users (neil@cairahq.com, etc.) authenticate through Okta SSO.
 

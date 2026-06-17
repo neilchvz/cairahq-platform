@@ -2,7 +2,7 @@
 
 ## Overview
 
-Password policy follows NIST 800-63B guidance — prioritizing length and breach detection over arbitrary complexity requirements and rotation schedules.
+Password policy follows NIST 800-63B guidance, prioritizing length and breach detection over arbitrary complexity requirements and rotation schedules.
 
 ## Policy Settings
 
@@ -27,9 +27,9 @@ Password policy follows NIST 800-63B guidance — prioritizing length and breach
 | Password expiration | Never | NIST 800-63B: arbitrary rotation increases risk by encouraging weak patterns |
 | Password history | Last 5 | Prevents immediate reuse after a voluntary reset |
 | Minimum password age | Not set | No restriction on voluntary resets |
-| Lockout threshold | 10 attempts | Balanced — not aggressive enough to cause self-lockout |
+| Lockout threshold | 10 attempts | Balanced, not aggressive enough to cause self-lockout |
 | Auto-unlock | 15 minutes | Avoids permanent lockout requiring admin intervention |
-| Show lockout failures | Enabled | Transparency — user knows when someone is attempting their account |
+| Show lockout failures | Enabled | Transparency, user knows when someone is attempting their account |
 | Send lockout email | Enabled | Proactive notification of potential brute force attempts |
 
 ## NIST 800-63B Alignment
@@ -48,11 +48,11 @@ This policy reflects the current NIST guidance on memorized secrets:
 - Periodic expiration without evidence of compromise
 - Password hints or knowledge-based authentication
 
-**The compensating control:** No password expiration is defensible only when MFA is enforced. Okta Verify is required for all users — a compromised password alone cannot result in account access without the enrolled device.
+**The compensating control:** No password expiration is defensible only when MFA is enforced. Okta Verify is required for all users. A compromised password alone cannot result in account access without the enrolled device.
 
 ## Production Note
 
-In a production environment with tiered user populations, a separate stricter password policy would apply to privileged accounts — longer minimum length (16+ characters), potentially enforced passphrase patterns for service accounts. The Okta Integrator Free Plan supports multiple password policies but group-based targeting of those policies requires Identity Engine features available on paid plans only.
+In a production environment with tiered user populations, a separate stricter password policy would apply to privileged accounts: longer minimum length (16+ characters), potentially enforced passphrase patterns for service accounts. The Okta Integrator Free Plan supports multiple password policies but group-based targeting of those policies requires Identity Engine features available on paid plans only.
 
 ---
 

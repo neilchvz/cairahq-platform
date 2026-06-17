@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Global Session Policy defines how long an authenticated Okta session remains valid. The policy is designed to balance security with usability — re-authenticating once every two weeks is a reasonable ask for standard users when MFA, breach detection, and (in production) device trust are active as compensating controls.
+The Global Session Policy defines how long an authenticated Okta session remains valid. The policy is designed to balance security with usability. Re-authenticating once every two weeks is a reasonable ask for standard users when MFA, breach detection, and (in production) device trust are active as compensating controls.
 
 ## Policy Settings
 

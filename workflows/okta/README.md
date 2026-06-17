@@ -1,6 +1,6 @@
 # Okta Workflows
 
-Okta Workflows is a no-code/low-code automation tool native to the Okta platform. It listens for identity events and executes actions across connected systems in response — no polling, no scheduled jobs, no manual triggers.
+Okta Workflows is a no-code/low-code automation tool native to the Okta platform. It listens for identity events and executes actions across connected systems in response: no polling, no scheduled jobs, no manual triggers.
 
 All flows live in the **Caira HQ** folder within the Okta Workflows console.
 
@@ -76,8 +76,8 @@ graph TD
 
 ## Implementation Notes
 
-**Read User step:** All three flows include an Okta Read User step after the trigger. The trigger event alone does not reliably pass full profile attributes — the Read User step explicitly fetches the complete user profile using the user ID from the trigger. This ensures fields populated by Terraform at provisioning time (title, department, manager, user type) are captured correctly.
+**Read User step:** All three flows include an Okta Read User step after the trigger. The trigger event alone does not reliably pass full profile attributes. The Read User step explicitly fetches the complete user profile using the user ID from the trigger. This ensures fields populated by Terraform at provisioning time (title, department, manager, user type) are captured correctly.
 
 **Gmail connector:** Email delivery uses the Gmail connector authenticated as `admin@cairahq.com`. All outbound notifications originate from this address.
 
-**Data retention:** Flow execution history is retained in Okta Workflows. Save data passing through flows is disabled — user profile data is fetched at runtime and not stored within the Workflows platform.
+**Data retention:** Flow execution history is retained in Okta Workflows. Save data passing through flows is disabled. User profile data is fetched at runtime and not stored within the Workflows platform.
